@@ -8,16 +8,26 @@ enum TokenType {
   DEDENT,
 };
 
+#define MAX_INDENT_STACK 128
+
 typedef struct {
-  uint32_t indent_level;
+  uint32_t indent_stack[MAX_INDENT_STACK];
+  uint32_t stack_size;
   uint32_t pending_dedents;
   bool newline_after_dedent;
 } Scanner;
 
 static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
+static uint32_t current_level(Scanner *scanner) {
+  if (scanner->stack_size == 0) return 0;
+  return scanner->indent_stack[scanner->stack_size - 1];
+}
+
 void *tree_sitter_litetxt_external_scanner_create(void) {
   Scanner *scanner = calloc(1, sizeof(Scanner));
+  scanner->indent_stack[0] = 0;
+  scanner->stack_size = 1;
   return scanner;
 }
 
@@ -26,18 +36,38 @@ void tree_sitter_litetxt_external_scanner_destroy(void *payload) { free(payload)
 unsigned tree_sitter_litetxt_external_scanner_serialize(void *payload,
                                                     char *buffer) {
   Scanner *scanner = (Scanner *)payload;
-  memcpy(buffer, scanner, sizeof(Scanner));
-  return sizeof(Scanner);
+  uint32_t size = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(bool) +
+                  scanner->stack_size * sizeof(uint32_t);
+  if (size > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return 0;
+  unsigned offset = 0;
+  memcpy(buffer + offset, &scanner->stack_size, sizeof(uint32_t));
+  offset += sizeof(uint32_t);
+  memcpy(buffer + offset, &scanner->pending_dedents, sizeof(uint32_t));
+  offset += sizeof(uint32_t);
+  memcpy(buffer + offset, &scanner->newline_after_dedent, sizeof(bool));
+  offset += sizeof(bool);
+  memcpy(buffer + offset, scanner->indent_stack,
+         scanner->stack_size * sizeof(uint32_t));
+  return size;
 }
 
 void tree_sitter_litetxt_external_scanner_deserialize(void *payload,
                                                   const char *buffer,
                                                   unsigned length) {
   Scanner *scanner = (Scanner *)payload;
-  if (length >= sizeof(Scanner)) {
-    memcpy(scanner, buffer, sizeof(Scanner));
+  if (length > 0) {
+    unsigned offset = 0;
+    memcpy(&scanner->stack_size, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(&scanner->pending_dedents, buffer + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(&scanner->newline_after_dedent, buffer + offset, sizeof(bool));
+    offset += sizeof(bool);
+    memcpy(scanner->indent_stack, buffer + offset,
+           scanner->stack_size * sizeof(uint32_t));
   } else {
-    scanner->indent_level = 0;
+    scanner->indent_stack[0] = 0;
+    scanner->stack_size = 1;
     scanner->pending_dedents = 0;
     scanner->newline_after_dedent = false;
   }
@@ -50,7 +80,6 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
   // Emit pending DEDENTs first
   if (scanner->pending_dedents > 0 && valid_symbols[DEDENT]) {
     scanner->pending_dedents--;
-    scanner->indent_level--;
     lexer->result_symbol = DEDENT;
     return true;
   }
@@ -65,10 +94,12 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     scanner->newline_after_dedent = false;
   }
 
+  uint32_t level = current_level(scanner);
+
   // At EOF, emit remaining DEDENTs
   if (lexer->eof(lexer)) {
-    if (scanner->indent_level > 0 && valid_symbols[DEDENT]) {
-      scanner->indent_level--;
+    if (scanner->stack_size > 1 && valid_symbols[DEDENT]) {
+      scanner->stack_size--;
       lexer->result_symbol = DEDENT;
       return true;
     }
@@ -97,8 +128,8 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     if (lexer->eof(lexer)) {
-      if (scanner->indent_level > 0 && valid_symbols[DEDENT]) {
-        scanner->indent_level--;
+      if (scanner->stack_size > 1 && valid_symbols[DEDENT]) {
+        scanner->stack_size--;
         lexer->result_symbol = DEDENT;
         return true;
       }
@@ -111,19 +142,26 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
   // 2 spaces = 1 indent level
   uint32_t new_level = spaces / 2;
 
-  if (new_level > scanner->indent_level) {
+  if (new_level > level) {
     // Indentation increased
     if (valid_symbols[INDENT]) {
-      scanner->indent_level = new_level;
+      if (scanner->stack_size < MAX_INDENT_STACK) {
+        scanner->indent_stack[scanner->stack_size++] = new_level;
+      }
       lexer->result_symbol = INDENT;
       return true;
     }
-  } else if (new_level < scanner->indent_level) {
-    // Indentation decreased
-    if (valid_symbols[DEDENT]) {
-      scanner->pending_dedents = scanner->indent_level - new_level - 1;
+  } else if (new_level < level) {
+    // Indentation decreased: pop stack entries above new_level
+    uint32_t pops = 0;
+    while (scanner->stack_size > 1 &&
+           scanner->indent_stack[scanner->stack_size - 1] > new_level) {
+      scanner->stack_size--;
+      pops++;
+    }
+    if (valid_symbols[DEDENT] && pops > 0) {
+      scanner->pending_dedents = pops - 1;
       scanner->newline_after_dedent = true;
-      scanner->indent_level--;
       lexer->result_symbol = DEDENT;
       return true;
     }
