@@ -76,3 +76,28 @@ C
       (content)))
   (segment
     (content)))
+
+================================================================================
+Dedent to sibling (1 level)
+================================================================================
+Parent
+  Child A
+    Grandchild A1
+    Grandchild A2
+  Child B
+    Grandchild B1
+--------------------------------------------------------------------------------
+
+(document
+  (segment
+    (content)
+    (segment
+      (content)
+      (segment
+        (content))
+      (segment
+        (content)))
+    (segment
+      (content)
+      (segment
+        (content)))))

@@ -11,6 +11,7 @@ enum TokenType {
 typedef struct {
   uint32_t indent_level;
   uint32_t pending_dedents;
+  bool newline_after_dedent;
 } Scanner;
 
 static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -38,6 +39,7 @@ void tree_sitter_litetxt_external_scanner_deserialize(void *payload,
   } else {
     scanner->indent_level = 0;
     scanner->pending_dedents = 0;
+    scanner->newline_after_dedent = false;
   }
 }
 
@@ -51,6 +53,16 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     scanner->indent_level--;
     lexer->result_symbol = DEDENT;
     return true;
+  }
+
+  // DEDENT consumed the newline; emit zero-width NEWLINE for parent context
+  if (scanner->newline_after_dedent) {
+    if (valid_symbols[NEWLINE]) {
+      scanner->newline_after_dedent = false;
+      lexer->result_symbol = NEWLINE;
+      return true;
+    }
+    scanner->newline_after_dedent = false;
   }
 
   // At EOF, emit remaining DEDENTs
@@ -110,6 +122,7 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     // Indentation decreased
     if (valid_symbols[DEDENT]) {
       scanner->pending_dedents = scanner->indent_level - new_level - 1;
+      scanner->newline_after_dedent = true;
       scanner->indent_level--;
       lexer->result_symbol = DEDENT;
       return true;
