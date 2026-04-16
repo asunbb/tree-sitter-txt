@@ -1,0 +1,18 @@
+{
+  "grammars": [
+    {
+      "name": "litetxt",
+      "camelcase": "Litetxt",
+      "scope": "source.txt",
+      "file-types": [
+        ".txt"
+      ]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for indented text segments"
+  },
+  "bindings": {}
+}

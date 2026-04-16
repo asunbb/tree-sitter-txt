@@ -1,0 +1,26 @@
+{
+  "name": "tree-sitter-txt",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for indented text segments",
+  "main": "src/parser.c",
+  "keywords": [
+    "tree-sitter",
+    "txt"
+  ],
+  "files": [
+    "grammar.js",
+    "tree-sitter.json",
+    "src/**",
+    "queries/*"
+  ],
+  "devDependencies": {
+    "tree-sitter-cli": "^0.24.7"
+  },
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "gen": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "genTest": "tree-sitter generate && tree-sitter test",
+    "parse": "tree-sitter parse"
+  }
+}
