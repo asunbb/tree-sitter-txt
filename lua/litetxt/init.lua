@@ -12,7 +12,9 @@ function M.get_root()
   -- debug.getinfo(1, "S").source 返回 "@<文件绝对路径>"，去掉首字符 "@" 后得到纯路径
   local source = debug.getinfo(1, "S").source:sub(2)
   -- :p:h:h:h 依次执行：转为全路径(:p) → 去掉文件名(:h) → 去掉 lua/(:h) → 去掉 litetxt/(:h)
-  return vim.fn.fnamemodify(source, ":p:h:h:h")
+  local path = vim.fn.fnamemodify(source, ":p:h:h:h")
+  print("litetxt -> " .. path)
+  return path
 end
 
 --- 插件初始化入口
