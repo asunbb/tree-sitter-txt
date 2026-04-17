@@ -3,6 +3,8 @@
 [中文](README.zh-CN.md)
 
 A [tree-sitter](https://tree-sitter.github.io/) grammar (named **litetxt**) that parses indented text files and enables code folding for `.txt` files in editors.
+This repository provides parser updates as a plugin.
+Note: the [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) repository has been archived and is no longer updated (unless the original author reverses the action).
 
 ## Features
 
@@ -13,26 +15,33 @@ A [tree-sitter](https://tree-sitter.github.io/) grammar (named **litetxt**) that
 
 ## Quick Start
 
-### Prerequisites
+### Install
 
-- [Node.js](https://nodejs.org/)
-- [tree-sitter CLI](https://tree-sitter.github.io/tree-sitter/creating-parsers#installation) (`tree-sitter-cli`)
+Lazy.nvim
 
-### Generate parser
+```lua
+{
+  "asunbb/tree-sitter-txt",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter"
+  },
+},
+```
 
 ```bash
+# Run in command line
+:TSUpdate
+:TSInstall litetxt
+```
+
+### Local development
+
+```bash
+# Generate parser
 npm run generate
-```
-
-### Run tests
-
-```bash
+# Run tests
 npm test
-```
-
-### Parse text from stdin
-
-```bash
+# Parse text from stdin
 echo "Heading
   Sub item 1
   Sub item 2

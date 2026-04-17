@@ -3,6 +3,8 @@
 [English](README.md)
 
 一个 [tree-sitter](https://tree-sitter.github.io/) 语法项目（语法名 **litetxt**），用于解析缩进文本文件，为编辑器中的 `.txt` 文件提供代码折叠功能。
+本仓库以插件形式提供解析器更新。
+注意，仓库 [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) 已存档不再更新（如果原作者不撤销操作）。
 
 ## 功能特性
 
@@ -13,26 +15,33 @@
 
 ## 快速开始
 
-### 前置依赖
+### 安装
 
-- [Node.js](https://nodejs.org/)
-- [tree-sitter CLI](https://tree-sitter.github.io/tree-sitter/creating-parsers#installation)（`tree-sitter-cli`）
+Lazy.nvim 
 
-### 生成解析器
+```lua
+{
+  "asunbb/tree-sitter-txt",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter"
+  },
+},
+```
 
 ```bash
+# 命令行执行
+:TSUpdate
+:TSInstall litetxt
+```
+
+### 本地验证生成解析器
+
+```bash
+# 生成解析器
 npm run generate
-```
-
-### 运行测试
-
-```bash
+# 运行测试
 npm test
-```
-
-### 从标准输入解析文本
-
-```bash
+# 从标准输入解析文本
 echo "标题
   子项 1
   子项 2
