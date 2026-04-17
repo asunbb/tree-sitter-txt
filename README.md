@@ -2,7 +2,7 @@
 
 [中文](README.zh-CN.md)
 
-A [tree-sitter](https://tree-sitter.github.io/) grammar (named **litetxt**) that parses indented text files and enables code folding for `.txt` files in editors.
+A [tree-sitter](https://tree-sitter.github.io/) grammar whose parser is named **litetxt**, providing code folding for `.txt` files.
 
 This repository provides parser updates as a plugin.
 

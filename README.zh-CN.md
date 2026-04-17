@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-一个 [tree-sitter](https://tree-sitter.github.io/) 语法项目（语法名 **litetxt**），用于解析缩进文本文件，为编辑器中的 `.txt` 文件提供代码折叠功能。
+一个 [tree-sitter](https://tree-sitter.github.io/) 语法项目，解析器名为 **litetxt**，用于解析 `.txt` 文件提供代码折叠能力。
 
 本仓库以插件形式提供解析器更新。
 
