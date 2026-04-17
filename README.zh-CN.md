@@ -57,13 +57,32 @@ echo "标题
 | `_indent` | 缩进层级增加 |
 | `_dedent` | 缩进层级减少 |
 
+## Neovim 安装
+
+### lazy.nvim
+
+```lua
+{
+  "asunbb/tree-sitter-txt",
+  dependencies = {"nvim-treesitter/nvim-treesitter"},
+  config = function()
+    require("litetxt").setup()
+  end,
+}
+```
+
+安装后，打开 `.txt` 文件并执行 `:TSInstall litetxt` 编译 parser。
+
 ## 项目结构
 
 ```
 grammar.js              语法定义
 tree-sitter.json        tree-sitter 元数据
 package.json            npm 包配置
-queries/folds.scm       编辑器折叠查询
+lua/litetxt/init.lua    Neovim 插件核心逻辑
+plugin/litetxt.lua      Neovim 自动加载入口
+queries/litetxt/
+  folds.scm             编辑器折叠查询
 src/
   parser.c              生成的解析器
   scanner.c             缩进外部扫描器

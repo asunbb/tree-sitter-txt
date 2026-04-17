@@ -57,13 +57,32 @@ Indentation handling is implemented via external tokens in `src/scanner.c`:
 | `_indent` | Increase in indentation level |
 | `_dedent` | Decrease in indentation level |
 
+## Neovim Installation
+
+### lazy.nvim
+
+```lua
+{
+  "asunbb/tree-sitter-txt",
+  dependencies = {"nvim-treesitter/nvim-treesitter"},
+  config = function()
+    require("litetxt").setup()
+  end,
+}
+```
+
+After installation, open a `.txt` file and run `:TSInstall litetxt` to compile the parser.
+
 ## Project Structure
 
 ```
 grammar.js              Grammar definition
 tree-sitter.json        tree-sitter metadata
 package.json            npm package config
-queries/folds.scm       Fold queries for editors
+lua/litetxt/init.lua    Neovim plugin core logic
+plugin/litetxt.lua      Neovim auto-load entry
+queries/litetxt/
+  folds.scm             Fold queries for editors
 src/
   parser.c              Generated parser
   scanner.c             External scanner for indentation
