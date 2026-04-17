@@ -18,12 +18,6 @@
 - [Node.js](https://nodejs.org/)
 - [tree-sitter CLI](https://tree-sitter.github.io/tree-sitter/creating-parsers#installation)（`tree-sitter-cli`）
 
-### 安装
-
-```bash
-npm install
-```
-
 ### 生成解析器
 
 ```bash

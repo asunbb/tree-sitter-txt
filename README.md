@@ -18,12 +18,6 @@ A [tree-sitter](https://tree-sitter.github.io/) grammar (named **litetxt**) that
 - [Node.js](https://nodejs.org/)
 - [tree-sitter CLI](https://tree-sitter.github.io/tree-sitter/creating-parsers#installation) (`tree-sitter-cli`)
 
-### Install
-
-```bash
-npm install
-```
-
 ### Generate parser
 
 ```bash
