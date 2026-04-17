@@ -1,9 +1,11 @@
-# tree-sitter-txt-again
+# tree-sitter-txt
 
 [中文](README.zh-CN.md)
 
 A [tree-sitter](https://tree-sitter.github.io/) grammar (named **litetxt**) that parses indented text files and enables code folding for `.txt` files in editors.
+
 This repository provides parser updates as a plugin.
+
 Note: the [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) repository has been archived and is no longer updated (unless the original author reverses the action).
 
 ## Features
@@ -29,7 +31,7 @@ Lazy.nvim
 ```
 
 ```bash
-# Run in command line
+# neovim command line
 :TSUpdate
 :TSInstall litetxt
 ```
@@ -65,22 +67,6 @@ Indentation handling is implemented via external tokens in `src/scanner.c`:
 | `_newline` | Line break between sibling segments |
 | `_indent` | Increase in indentation level |
 | `_dedent` | Decrease in indentation level |
-
-## Neovim Installation
-
-### lazy.nvim
-
-```lua
-{
-  "asunbb/tree-sitter-txt",
-  dependencies = {"nvim-treesitter/nvim-treesitter"},
-  config = function()
-    require("litetxt").setup()
-  end,
-}
-```
-
-After installation, open a `.txt` file and run `:TSInstall litetxt` to compile the parser.
 
 ## Project Structure
 

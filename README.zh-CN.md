@@ -1,9 +1,11 @@
-# tree-sitter-txt-again
+# tree-sitter-txt
 
 [English](README.md)
 
 一个 [tree-sitter](https://tree-sitter.github.io/) 语法项目（语法名 **litetxt**），用于解析缩进文本文件，为编辑器中的 `.txt` 文件提供代码折叠功能。
+
 本仓库以插件形式提供解析器更新。
+
 注意，仓库 [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) 已存档不再更新（如果原作者不撤销操作）。
 
 ## 功能特性
@@ -29,7 +31,7 @@ Lazy.nvim
 ```
 
 ```bash
-# 命令行执行
+# neovim 命令行
 :TSUpdate
 :TSInstall litetxt
 ```
@@ -65,22 +67,6 @@ echo "标题
 | `_newline` | 同级段落之间的换行 |
 | `_indent` | 缩进层级增加 |
 | `_dedent` | 缩进层级减少 |
-
-## Neovim 安装
-
-### lazy.nvim
-
-```lua
-{
-  "asunbb/tree-sitter-txt",
-  dependencies = {"nvim-treesitter/nvim-treesitter"},
-  config = function()
-    require("litetxt").setup()
-  end,
-}
-```
-
-安装后，打开 `.txt` 文件并执行 `:TSInstall litetxt` 编译 parser。
 
 ## 项目结构
 
