@@ -178,3 +178,34 @@ C
       (content)))
   (segment
     (content)))
+
+================================================================================
+Dedent with blank lines and trailing spaces
+================================================================================
+Parent
+  Child A
+    aaaa
+
+    sfdsa
+
+    sdfafsafa
+
+  Child B
+  Child C
+--------------------------------------------------------------------------------
+
+(document
+  (segment
+    (content)
+    (segment
+      (content)
+      (segment
+        (content))
+      (segment
+        (content))
+      (segment
+        (content)))
+    (segment
+      (content))
+    (segment
+      (content))))

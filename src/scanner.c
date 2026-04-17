@@ -84,12 +84,25 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
-  // DEDENT consumed the newline already; we still need to emit a zero-width
-  // NEWLINE so the grammar's seq($._newline, $.segment) can match the sibling
-  // segment that follows the dedent
+  // DEDENT consumed the newline already; we still need to emit a NEWLINE
+  // so the grammar's seq($._newline, $.segment) can match the sibling
+  // segment that follows the dedent. Since DEDENT used mark_end right after
+  // '\n' (before spaces), we must consume spaces and skip blank lines here
+  // to position the parser at the start of the next content.
   if (scanner->newline_after_dedent) {
     if (valid_symbols[NEWLINE]) {
       scanner->newline_after_dedent = false;
+      while (true) {
+        while (lexer->lookahead == ' ') {
+          advance(lexer);
+        }
+        if (lexer->lookahead == '\n') {
+          advance(lexer);
+          continue;
+        }
+        break;
+      }
+      lexer->mark_end(lexer);
       lexer->result_symbol = NEWLINE;
       return true;
     }
@@ -114,6 +127,11 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
 
   // Consume the newline
   advance(lexer);
+
+  // Mark the end of the token right after '\n', before consuming any spaces.
+  // For DEDENT, this prevents the segment from extending into the next sibling's row.
+  // For NEWLINE/INDENT, mark_end will be re-called later to include consumed whitespace.
+  lexer->mark_end(lexer);
 
   // Skip blank lines entirely — they carry no structural meaning.
   // Count leading spaces of the next non-blank line to determine indent level.
@@ -153,6 +171,7 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
       if (scanner->stack_size < MAX_INDENT_STACK) {
         scanner->indent_stack[scanner->stack_size++] = new_level;
       }
+      lexer->mark_end(lexer);
       lexer->result_symbol = INDENT;
       return true;
     }
@@ -167,16 +186,20 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     if (valid_symbols[DEDENT] && pops > 0) {
       scanner->pending_dedents = pops - 1;
       scanner->newline_after_dedent = true;
+      // Don't re-mark: DEDENT uses mark_end from after '\n', so the segment
+      // ends before the next sibling's row, fixing fold boundaries.
       lexer->result_symbol = DEDENT;
       return true;
     }
     if (valid_symbols[NEWLINE]) {
+      lexer->mark_end(lexer);
       lexer->result_symbol = NEWLINE;
       return true;
     }
   } else {
     // Same indentation level
     if (valid_symbols[NEWLINE]) {
+      lexer->mark_end(lexer);
       lexer->result_symbol = NEWLINE;
       return true;
     }
