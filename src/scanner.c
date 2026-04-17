@@ -84,7 +84,9 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
-  // DEDENT consumed the newline; emit zero-width NEWLINE for parent context
+  // DEDENT consumed the newline already; we still need to emit a zero-width
+  // NEWLINE so the grammar's seq($._newline, $.segment) can match the sibling
+  // segment that follows the dedent
   if (scanner->newline_after_dedent) {
     if (valid_symbols[NEWLINE]) {
       scanner->newline_after_dedent = false;
@@ -113,7 +115,8 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
   // Consume the newline
   advance(lexer);
 
-  // Skip blank lines, find next non-blank line and count its leading spaces
+  // Skip blank lines entirely — they carry no structural meaning.
+  // Count leading spaces of the next non-blank line to determine indent level.
   uint32_t spaces = 0;
   while (true) {
     spaces = 0;
@@ -139,7 +142,9 @@ bool tree_sitter_litetxt_external_scanner_scan(void *payload, TSLexer *lexer,
     break;
   }
 
-  // 2 spaces = 1 indent level
+  // 2 spaces = 1 indent level.
+  // Jumping multiple levels (e.g. 0→6 spaces) produces a single INDENT —
+  // same as Python: the actual indent depth is recorded on the stack.
   uint32_t new_level = spaces / 2;
 
   if (new_level > level) {
