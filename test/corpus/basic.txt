@@ -101,3 +101,28 @@ Parent
       (content)
       (segment
         (content)))))
+
+================================================================================
+Irregular indentation (code block)
+================================================================================
+    Parent
+      Code header
+          deep line 1
+        deep line 2
+      After code
+      More content
+--------------------------------------------------------------------------------
+
+(document
+  (segment
+    (content)
+    (segment
+      (content)
+      (segment
+        (content)))
+    (segment
+      (content))
+    (segment
+      (content))
+    (segment
+      (content))))
