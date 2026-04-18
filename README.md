@@ -13,7 +13,7 @@ Note: the [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) 
 - **Indentation-based segment parsing** — content at different indent levels is structured as parent-child segments
 - **Multi-level nesting** — arbitrary nesting depth supported
 - **Irregular indentation handling** — correctly processes code-block-like indentation patterns
-- **Editor folding support** — includes fold queries (`queries/folds.scm`) for Neovim, VS Code, and other tree-sitter-compatible editors
+- **Editor folding support** — includes fold queries (`queries/folds.scm`)
 
 ## Quick Start
 
