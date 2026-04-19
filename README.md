@@ -1,6 +1,6 @@
 # tree-sitter-txt
 
-[中文](README.zh-CN.md)
+[简体中文](README.zh-CN.md)
 
 A [tree-sitter](https://tree-sitter.github.io/) grammar whose parser is named **litetxt**, providing code folding for `.txt` files.
 
